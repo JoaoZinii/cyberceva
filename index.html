@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alerta de Segurança</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #facc15; /* Fundo amarelo sólido */
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 0;
+        }
+
+        /* Alertas flutuantes de Danger espalhados */
+        .floating-alert {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            padding: 8px 16px;
+            font-weight: 900;
+            font-size: 13px;
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
+            z-index: 5;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: popAnim 0.3s ease-in-out infinite alternate;
+        }
+
+        @keyframes popAnim {
+            0% { transform: scale(0.9) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        /* Barras de listras diagonais de perigo (topo e rodapé) */
+        .danger-stripes {
+            width: 100%;
+            height: 25px;
+            background: repeating-linear-gradient(
+                45deg,
+                #000000,
+                #000000 20px,
+                #ffcc00 20px,
+                #ffcc00 40px
+            );
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        /* Container principal dentro de um quadrado/caixa vermelha estilo cartaz */
+        .poster-container {
+            position: relative;
+            z-index: 10;
+            width: 92%;
+            max-width: 550px;
+            margin: auto;
+            background-color: #a81c1c;
+            border: 4px solid #ffffff;
+            border-radius: 12px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(168, 28, 28, 0.6);
+            animation: containerPulse 1s infinite ease-in-out;
+        }
+
+        @keyframes containerPulse {
+            0%, 100% { border-color: rgba(255, 255, 255, 0.8); }
+            50% { border-color: rgba(250, 204, 21, 1); }
+        }
+
+        /* Ícone de danger superior */
+        .top-danger-icon {
+            font-size: 40px;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            animation: pulseIcon 0.6s infinite alternate;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+
+        /* Bloco do QR Code Falso */
+        .qr-mockup {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            width: 170px;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+        }
+
+        /* Simulação visual de blocos de QR Code */
+        .qr-grid {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 6px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .qr-block {
+            background: #000000;
+            border-radius: 2px;
+        }
+
+        .qr-block.empty {
+            background: #ffffff;
+        }
+
+        /* Círculo vermelho com exclamação no centro do QR code */
+        .qr-center-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55px;
+            height: 55px;
+            background: #dc2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            font-weight: 900;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+            border: 3px solid #ffffff;
+        }
+
+        /* Textos principais do cartaz */
+        .main-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.25;
+            color: #ffffff;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .main-title span.yellow {
+            color: #facc15;
+            display: block;
+            margin-top: 4px;
+            text-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+        }
+
+        /* Linha divisória branca */
+        .divider {
+            width: 70%;
+            height: 3px;
+            background: #ffffff;
+            margin: 10px auto 15px auto;
+            border-radius: 2px;
+        }
+
+        .sub-message {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        /* Faixa amarela inferior ("PARTICIPE DO TREINAMENTO...") */
+        .training-strip {
+            background: #facc15;
+            color: #111827;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Rodapé com e-mail correto */
+        .footer-info {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        .footer-info a {
+            color: #facc15;
+            text-decoration: none;
+            word-break: break-all;
+            font-weight: 700;
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 480px) {
+            .poster-container {
+                padding: 20px 12px;
+            }
+            .main-title {
+                font-size: 20px;
+            }
+            .qr-mockup {
+                width: 140px;
+                height: 140px;
+            }
+            .training-strip {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Faixa superior de perigo (preto e amarelo) -->
+    <div class="danger-stripes"></div>
+
+    <div class="poster-container">
+        <!-- Ícone Danger superior igual ao cartaz -->
+        <div class="top-danger-icon">⚠️</div>
+
+        <!-- Simulação do QR Code com o selo vermelho de alerta -->
+        <div class="qr-mockup">
+            <div class="qr-grid">
+                <div class="qr-block"></div><div class="qr-block"></div><div class="qr-block empty"></div><div class="qr-block"></div>
+                <div class="qr-block empty"></div><div class="qr-block"></div><div class="qr-block"></div><div class="qr-block empty"></div>
+                <div class="qr-block"></div><div class="qr-block empty"></div><div class="qr-block"></div><div class="qr-block"></div>
+                <div class="qr-block"></div><div class="qr-block"></div><div class="qr-block empty"></div><div class="qr-block"></div>
+            </div>
+            <div class="qr-center-badge">!</div>
+        </div>
+
+        <!-- Mensagens principais -->
+        <div class="main-title">
+            Você caiu em um
+            <span class="yellow">QR Code Malicioso!!!!</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sub-message">
+            Este QR Code poderia colocar você e a Ceva em risco.
+        </div>
+
+        <!-- Faixa amarela central -->
+        <div class="training-strip">
+            Participe do Treinamento de Cybersegurança!
+        </div>
+
+        <!-- Rodapé explicativo e contato com o e-mail solicitado -->
+        <div class="footer-info">
+            Fique atento com a sua segurança digital! Denuncie qualquer atividade suspeita para<br>
+            <a href="mailto:yberaware-group@ceva.com">yberaware-group@ceva.com</a>
+        </div>
+    </div>
+
+    <!-- Faixa inferior de perigo (preto e amarelo) -->
+    <div class="danger-stripes"></div>
+
+    <script>
+        // Alertas flutuantes dinâmicos de Danger espalhados pela tela
+        const alertTexts = ["⚠️ DANGER", "🚨 PHISHING", "⚠️ QUISHING", "🚨 ALERTA DE SEGURANÇA"];
+        
+        function createFloatingAlert() {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'floating-alert';
+            
+            const randomText = alertTexts[Math.floor(Math.random() * alertTexts.length)];
+            alertDiv.innerHTML = randomText;
+
+            const maxX = Math.max(10, window.innerWidth - 180);
+            const maxY = Math.max(10, window.innerHeight - 60);
+            
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            alertDiv.style.left = `${x}px`;
+            alertDiv.style.top = `${y}px`;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 1600);
+        }
+
+        setInterval(createFloatingAlert, 350);
+    </script>
+</body>
+</html>
